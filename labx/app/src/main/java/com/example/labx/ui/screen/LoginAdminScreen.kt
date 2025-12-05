@@ -1,0 +1,144 @@
+package com.example.labx.ui.screen
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginAdminScreen(
+    onLoginExitoso: () -> Unit,
+    onVolverClick: () -> Unit,
+    onValidarCredenciales: (String, String) -> Boolean,
+    onGuardarSesion: (String) -> Unit
+) {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var mostrarPassword by remember { mutableStateOf(false) }
+    var mensajeError by remember { mutableStateOf<String?>(null) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Login Administrador") },
+                navigationIcon = {
+                    IconButton(onClick = onVolverClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+
+            Text(text = "🔐", fontSize = 72.sp)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Panel de Administración",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            OutlinedTextField(
+                value = username,
+                onValueChange = {
+                    username = it
+                    mensajeError = null
+                },
+                label = { Text("Usuario") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    mensajeError = null
+                },
+                label = { Text("Contraseña") },
+                singleLine = true,
+                visualTransformation = if (mostrarPassword)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (mensajeError != null) {
+                Text(
+                    text = mensajeError!!,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 14.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    when {
+                        username.isBlank() || password.isBlank() -> {
+                            mensajeError = "Completa todos los campos"
+                        }
+
+                        onValidarCredenciales(username, password) -> {
+                            onGuardarSesion(username)
+                            onLoginExitoso()
+                        }
+
+                        else -> {
+                            mensajeError = "Credenciales incorrectas"
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text("INICIAR SESIÓN")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                )
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("ℹ️ Credenciales de prueba", fontSize = 12.sp)
+                    Text("Usuario: admin", fontSize = 12.sp)
+                    Text("Contraseña: admin123", fontSize = 12.sp)
+                }
+            }
+        }
+    }
+}
+

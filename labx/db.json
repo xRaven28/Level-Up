@@ -1,0 +1,94 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "title": "Mouse Gamer RGB Profesional",
+      "description": "Mouse óptico de alta precisión con iluminación RGB personalizable. Cuenta con 7 botones programables, sensor óptico de 12800 DPI ajustable y cable trenzado de nylon. Ideal para gaming competitivo y uso profesional. Compatible con Windows y MacOS.",
+      "price": 25000,
+      "category": "Periféricos",
+      "image": "https://via.placeholder.com/400x400/FF6B6B/FFFFFF?text=Mouse+Gamer"
+    },
+    {
+      "id": 2,
+      "title": "Teclado Mecánico Retroiluminado",
+      "description": "Teclado mecánico con switches blue para máxima precisión. Retroiluminación LED RGB con múltiples efectos. Base de aluminio reforzada, teclas anti-ghosting y reposamuñecas magnético. Perfecto para escritura prolongada y gaming.",
+      "price": 45000,
+      "category": "Periféricos",
+      "image": "https://via.placeholder.com/400x400/4ECDC4/FFFFFF?text=Teclado"
+    },
+    {
+      "id": 3,
+      "title": "Audífonos Gaming RGB 7.1",
+      "description": "Auriculares con sonido envolvente virtual 7.1 y micrófono desmontable con cancelación de ruido. Almohadillas de memory foam ultra cómodas. Iluminación RGB sincronizable. Cable trenzado de 2 metros. Compatible con PC, PS5, Xbox y Nintendo Switch.",
+      "price": 35000,
+      "category": "Audio",
+      "image": "https://via.placeholder.com/400x400/45B7D1/FFFFFF?text=Audífonos"
+    },
+    {
+      "id": 4,
+      "title": "Webcam Full HD 1080p",
+      "description": "Cámara web con resolución 1920x1080 a 30fps. Micrófono estéreo incorporado con reducción de ruido. Enfoque automático y corrección de luz. Clip universal compatible con monitores y laptops. Ideal para videoconferencias, streaming y clases online.",
+      "price": 55000,
+      "category": "Video",
+      "image": "https://via.placeholder.com/400x400/96CEB4/FFFFFF?text=Webcam"
+    },
+    {
+      "id": 5,
+      "title": "Monitor Gaming 24 pulgadas 144Hz",
+      "description": "Pantalla LED IPS de 24 pulgadas con tasa de refresco de 144Hz y tiempo de respuesta de 1ms. Resolución Full HD 1920x1080. Tecnología FreeSync para eliminar tearing. Ángulos de visión 178°. Entradas HDMI y DisplayPort. Soporte VESA incluido.",
+      "price": 180000,
+      "category": "Monitores",
+      "image": "https://via.placeholder.com/400x400/FFEAA7/000000?text=Monitor"
+    },
+    {
+      "id": 6,
+      "title": "SSD NVMe 1TB Alta Velocidad",
+      "description": "Disco sólido M.2 NVMe PCIe Gen3 x4 con capacidad de 1TB. Velocidad de lectura de 3500 MB/s y escritura de 3000 MB/s. Tecnología 3D NAND para mayor durabilidad. Ideal para sistema operativo y aplicaciones exigentes. Incluye software de clonación.",
+      "price": 85000,
+      "category": "Almacenamiento",
+      "image": "https://via.placeholder.com/400x400/DFE6E9/000000?text=SSD"
+    },
+    {
+      "id": 7,
+      "title": "Silla Gamer Ergonómica Premium",
+      "description": "Silla gaming con respaldo reclinable hasta 180°. Soporte lumbar ajustable y almohada cervical incluida. Reposabrazos 4D (altura, ángulo, profundidad, rotación). Base de aluminio con ruedas silenciosas. Tapizado en cuero sintético transpirable. Soporta hasta 150kg.",
+      "price": 120000,
+      "category": "Mobiliario",
+      "image": "https://via.placeholder.com/400x400/74B9FF/FFFFFF?text=Silla+Gamer"
+    },
+    {
+      "id": 8,
+      "title": "Mousepad XXL Extendido",
+      "description": "Alfombrilla de escritorio de tamaño 900x400x3mm. Superficie de tela de microfibra para máxima precisión. Base de goma antideslizante. Bordes cosidos para mayor durabilidad. Diseño minimalista negro. Suficientemente grande para teclado y mouse.",
+      "price": 12000,
+      "category": "Accesorios",
+      "image": "https://via.placeholder.com/400x400/A29BFE/FFFFFF?text=Mousepad"
+    },
+    {
+      "id": 9,
+      "title": "Micrófono USB Condensador",
+      "description": "Micrófono de condensador con patrón cardioide para podcasting y streaming. Conexión USB plug-and-play. Botón de mute táctil y control de ganancia. Incluye brazo articulado y filtro anti-pop. Compatible con Windows, MacOS y Linux.",
+      "price": 65000,
+      "category": "Audio",
+      "image": "https://via.placeholder.com/400x400/FD79A8/FFFFFF?text=Micrófono"
+    },
+    {
+      "id": 10,
+      "title": "Hub USB 3.0 de 7 Puertos",
+      "description": "Concentrador USB 3.0 con 7 puertos de alta velocidad. Velocidad de transferencia hasta 5Gbps. Alimentación externa de 12V incluida. LEDs indicadores de actividad. Interruptores individuales por puerto. Compatible con USB 2.0 y 1.1. Carcasa de aluminio.",
+      "price": 18000,
+      "category": "Accesorios",
+      "image": "https://via.placeholder.com/400x400/636E72/FFFFFF?text=Hub+USB"
+    }
+  ],
+  "comentarios": [],
+  "categorias": [
+    "Periféricos",
+    "Audio",
+    "Video",
+    "Monitores",
+    "Almacenamiento",
+    "Mobiliario",
+    "Accesorios"
+  ]
+}
