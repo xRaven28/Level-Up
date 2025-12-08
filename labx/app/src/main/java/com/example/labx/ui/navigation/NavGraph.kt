@@ -3,6 +3,8 @@ package com.example.labx.ui.navigation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,22 +16,36 @@ import com.example.labx.data.local.PreferenciasManager
 import com.example.labx.data.local.SesionUsuarioManager
 import com.example.labx.data.repository.ProductoRepositoryImpl
 import com.example.labx.data.repository.UsuarioRepository
+import com.example.labx.domain.repository.RepositorioProductos
 import com.example.labx.ui.screen.*
 import com.example.labx.ui.viewmodel.*
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    productoRepository: ProductoRepositoryImpl,
     preferenciasManager: PreferenciasManager,
-    productoViewModel: ProductoViewModel,
     modifier: Modifier = Modifier
 ) {
-
     val context = LocalContext.current
 
-    // ✅ ÚNICO CARRITO VIEWMODEL COMPARTIDO ENTRE TODAS LAS PANTALLAS
+    val repositorioProductos: RepositorioProductos =
+        ProductoRepositoryImpl(
+            AppDatabase.getDatabase(context).productoDao()
+        )
+
     val carritoViewModel: CarritoViewModel = viewModel()
+
+    val productoViewModel: ProductoViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                if (modelClass.isAssignableFrom(ProductoViewModel::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    return ProductoViewModel(repositorioProductos) as T
+                }
+                throw IllegalArgumentException("ViewModel inválido")
+            }
+        }
+    )
 
     val usuarioViewModel: UsuarioViewModel = viewModel(
         factory = UsuarioViewModelFactory(
@@ -48,35 +64,51 @@ fun NavGraph(
 
         /* ---------- PORTADA ---------- */
         composable(Rutas.PORTADA) {
+
+            val sesionManager = SesionUsuarioManager(context)
+            val haySesionUsuario = sesionManager.obtenerUsuarioActivoId() != null
+            val haySesionAdmin = preferenciasManager.estaAdminLogueado()
+
             PortadaScreen(
                 onEntrarClick = {
                     navController.navigate(Rutas.HOME) {
                         popUpTo(Rutas.PORTADA) { inclusive = true }
                     }
                 },
-                onLoginUsuarioClick = { navController.navigate(Rutas.LOGIN_USUARIO) },
-                onLoginAdminClick = { navController.navigate(Rutas.LOGIN_ADMIN) }
+                onLoginClick = {
+                    when {
+                        haySesionAdmin -> navController.navigate(Rutas.PANEL_ADMIN)
+                        haySesionUsuario -> navController.navigate(Rutas.MI_CUENTA)
+                        else -> navController.navigate(Rutas.LOGIN_USUARIO)
+                    }
+                }
             )
         }
 
         /* ---------- HOME ---------- */
         composable(Rutas.HOME) {
             HomeScreen(
-                productoRepository = productoRepository,
+                repositorioLocal = repositorioProductos,
                 usuarioViewModel = usuarioViewModel,
                 carritoViewModel = carritoViewModel,
+
+                // ✅ Enviamos SOLO EL ID
                 onProductoClick = { id ->
                     navController.navigate("${Rutas.DETALLE}/$id")
                 },
+
                 onCarritoClick = {
                     navController.navigate(Rutas.CARRITO)
                 },
+
                 onIrLogin = {
                     navController.navigate(Rutas.LOGIN_USUARIO)
                 },
+
                 onMiCuentaClick = {
                     navController.navigate(Rutas.MI_CUENTA)
                 },
+
                 onVolverPortada = {
                     navController.navigate(Rutas.PORTADA) {
                         popUpTo(Rutas.HOME) { inclusive = true }
@@ -89,13 +121,14 @@ fun NavGraph(
         composable(
             route = "${Rutas.DETALLE}/{productoId}",
             arguments = listOf(navArgument("productoId") { type = NavType.IntType })
-        ) {
-            val productoId = it.arguments?.getInt("productoId") ?: 0
+        ) { backStackEntry ->
+
+            val productoId = backStackEntry.arguments?.getInt("productoId") ?: 0
 
             DetalleProductoScreen(
                 productoId = productoId,
-                productoRepository = productoRepository,
-                carritoViewModel = carritoViewModel, // ✅ PASADO CORRECTAMENTE
+                productoRepository = repositorioProductos,
+                carritoViewModel = carritoViewModel,
                 onVolverClick = { navController.popBackStack() }
             )
         }
@@ -106,9 +139,12 @@ fun NavGraph(
                 carritoViewModel = carritoViewModel,
                 usuarioViewModel = usuarioViewModel,
                 onVolverClick = { navController.popBackStack() },
+
+                // ✅ También navegamos por ID
                 onProductoClick = { id ->
                     navController.navigate("${Rutas.DETALLE}/$id")
                 },
+
                 onIrACheckout = {
                     navController.navigate(Rutas.CHECKOUT)
                 }
@@ -212,10 +248,10 @@ fun NavGraph(
                 return@composable
             }
 
-            val productos by productoViewModel.uiState.collectAsState()
+            val productosState by productoViewModel.uiState.collectAsState()
 
             AdminPanelScreen(
-                productos = productos.productos,
+                productos = productosState.productos,
                 usernameAdmin = preferenciasManager.obtenerUsernameAdmin() ?: "Admin",
                 onAgregarProducto = {
                     navController.navigate("formulario_producto?productoId=-1")
@@ -229,6 +265,9 @@ fun NavGraph(
                 onCerrarSesion = {
                     preferenciasManager.cerrarSesionAdmin()
                     navController.navigate(Rutas.PORTADA) { popUpTo(0) }
+                },
+                onVolver = {
+                    navController.popBackStack()
                 },
                 usuarioViewModel = usuarioViewModel,
                 onVerProductosApi = {

@@ -15,12 +15,6 @@ import androidx.compose.ui.unit.sp
 import com.example.labx.domain.model.Producto
 import com.example.labx.data.local.entity.UsuarioEntity
 import com.example.labx.ui.viewmodel.UsuarioViewModel
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Add
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +26,8 @@ fun AdminPanelScreen(
     onEliminarProducto: (Producto) -> Unit,
     onCerrarSesion: () -> Unit,
     usuarioViewModel: UsuarioViewModel,
-    onVerProductosApi: () -> Unit
+    onVerProductosApi: () -> Unit,
+    onVolver: () -> Unit // ✅ ESTE ES EL VOLVER REAL
 ) {
 
     var mostrarDialogoEliminar by remember { mutableStateOf<Producto?>(null) }
@@ -58,6 +53,15 @@ fun AdminPanelScreen(
                         )
                     }
                 },
+
+                // ✅ BOTÓN VOLVER (NO CIERRA SESIÓN)
+                navigationIcon = {
+                    IconButton(onClick = onVolver) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+
+                // ✅ BOTÓN CERRAR SESIÓN REAL
                 actions = {
                     IconButton(onClick = onCerrarSesion) {
                         Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión")
@@ -82,6 +86,7 @@ fun AdminPanelScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+
             Button(
                 onClick = onVerProductosApi,
                 modifier = Modifier
@@ -93,7 +98,6 @@ fun AdminPanelScreen(
                 Text("Ver Productos desde API")
             }
 
-            // Tabs
             TabRow(selectedTabIndex = pestanaSeleccionada) {
                 Tab(
                     selected = pestanaSeleccionada == 0,
@@ -168,6 +172,8 @@ fun AdminPanelScreen(
     }
 }
 
+/* ================= USUARIOS ================= */
+
 @Composable
 fun UsuarioItem(usuario: UsuarioEntity) {
     Card(
@@ -191,6 +197,8 @@ fun UsuarioItem(usuario: UsuarioEntity) {
         }
     }
 }
+
+/* ================= PRODUCTOS ================= */
 
 @Composable
 fun ListaProductos(
@@ -259,6 +267,8 @@ fun AdminProductoCard(
         }
     }
 }
+
+/* ================= ESTADÍSTICAS ================= */
 
 @Composable
 fun EstadisticasPanel(productos: List<Producto>) {
