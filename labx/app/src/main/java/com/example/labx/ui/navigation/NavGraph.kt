@@ -22,6 +22,7 @@ import com.example.labx.ui.screen.*
 import com.example.labx.ui.viewmodel.*
 import com.example.labx.domain.model.Producto
 
+
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -45,14 +46,15 @@ fun NavGraph(
         }
     )
 
-    val usuarioViewModel: UsuarioViewModel = viewModel(
-        factory = UsuarioViewModelFactory(
+    val usuarioViewModel = remember {
+        UsuarioViewModel(
             repository = UsuarioRepository(
-                AppDatabase.getDatabase(context).usuarioDao()
+                usuarioDao = AppDatabase.getDatabase(context).usuarioDao()
             ),
             sesionUsuarioManager = SesionUsuarioManager(context)
         )
-    )
+    }
+
 
     NavHost(
         navController = navController,
@@ -276,9 +278,6 @@ fun NavGraph(
 
                 usuarioViewModel = usuarioViewModel,
 
-                onVerProductosApi = {
-                    navController.navigate(Rutas.PRODUCTOS_API)
-                }
             )
         }
 

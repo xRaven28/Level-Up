@@ -32,10 +32,6 @@ import com.example.labx.ui.viewmodel.CarritoEvento
 import com.example.labx.ui.viewmodel.CarritoViewModel
 import kotlinx.coroutines.delay
 
-/* =========================
-   🎨 PALETA DARK GAMER
-   ========================= */
-
 private val Onyx = Color(0xFF131515)
 private val Graphite = Color(0xFF2B2C28)
 private val Verdigris = Color(0xFF339989)
@@ -139,7 +135,6 @@ fun DetalleProductoScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
 
-                        // ✅ HERO DARK CON VERDIGRIS
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -170,7 +165,6 @@ fun DetalleProductoScreen(
                             )
                         }
 
-                        // ✅ PRECIO FLOTANTE VERDIGRIS
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -199,7 +193,6 @@ fun DetalleProductoScreen(
                             }
                         }
 
-                        // ✅ CARD GRAPHITE
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -273,7 +266,6 @@ fun DetalleProductoScreen(
         }
     }
 
-    // ✅ NOTIFICACIÓN SUPERIOR
     Box(
         modifier = Modifier
             .fillMaxSize()

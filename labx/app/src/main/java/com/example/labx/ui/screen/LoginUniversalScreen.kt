@@ -85,14 +85,12 @@ fun LoginUniversalScreen(
             Button(
                 onClick = {
 
-                    // ✅ INTENTO LOGIN ADMIN
                     if (preferenciasManager.validarCredencialesAdmin(input, password)) {
                         preferenciasManager.guardarSesionAdmin(input)
                         onLoginAdmin()
                         return@Button
                     }
 
-                    // ✅ INTENTO LOGIN USUARIO
                     if (input.isNotBlank()) {
                         usuarioViewModel.loginPorEmail(input)
                     } else {

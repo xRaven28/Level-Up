@@ -15,17 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.labx.domain.model.Producto
 
-/**
- * FormularioProductoScreen: Formulario para agregar o editar productos
- * 
- * Funcionalidades:
- * - Modo agregar (productoExistente = null)
- * - Modo editar (productoExistente != null)
- * - Validaciones de todos los campos
- * - Mensajes de error específicos
- * 
- * Autor: Prof. Sting Adams Parra Silva
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioProductoScreen(

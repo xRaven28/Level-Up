@@ -41,8 +41,35 @@ class UsuarioViewModel(
             }
         }
     }
+    fun actualizarUsuario(usuario: UsuarioEntity) {
+        viewModelScope.launch {
+            try {
+                repository.actualizarUsuario(usuario)
+                cargarUsuarios()
 
-    // ✅ REGISTRO DE USUARIO NORMAL
+                val usuarioActual = _authState.value.usuarioActual
+                if (usuarioActual != null && usuarioActual.id == usuario.id) {
+                    _authState.value = _authState.value.copy(usuarioActual = usuario)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // ✅ ELIMINAR USUARIO (ADMIN)
+    fun eliminarUsuario(usuario: UsuarioEntity) {
+        viewModelScope.launch {
+            try {
+                repository.eliminarUsuario(usuario)
+                cargarUsuarios()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun registrarUsuario(
         nombreCompleto: String,
         email: String,
@@ -91,7 +118,6 @@ class UsuarioViewModel(
         }
     }
 
-    // ✅ LOGIN SOLO POR EMAIL (USUARIO NORMAL)
     fun loginPorEmail(email: String) {
         viewModelScope.launch {
             try {
@@ -123,7 +149,6 @@ class UsuarioViewModel(
         }
     }
 
-    // ✅ CERRAR SESIÓN USUARIO NORMAL
     fun cerrarSesion() {
         sesionUsuarioManager.cerrarSesion()
         _authState.value = AuthState()
@@ -151,20 +176,5 @@ class UsuarioViewModel(
 
         val numeros = Random.nextInt(100, 999)
         return "$base$numeros"
-    }
-}
-
-// ✅ FACTORY
-class UsuarioViewModelFactory(
-    private val repository: UsuarioRepository,
-    private val sesionUsuarioManager: SesionUsuarioManager
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(UsuarioViewModel::class.java)) {
-            return UsuarioViewModel(repository, sesionUsuarioManager) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

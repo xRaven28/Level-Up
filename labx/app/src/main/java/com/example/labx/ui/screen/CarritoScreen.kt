@@ -31,10 +31,6 @@ import com.example.labx.ui.viewmodel.CarritoViewModel
 import com.example.labx.ui.viewmodel.UsuarioViewModel
 import kotlinx.coroutines.flow.collectLatest
 
-/* =========================
-   🎨 PALETA OFICIAL NUEVA
-   ========================= */
-
 private val Onyx = Color(0xFF131515)
 private val Graphite = Color(0xFF2B2C28)
 private val Verdigris = Color(0xFF339989)
@@ -61,7 +57,6 @@ fun CarritoScreen(
     val descuento = if (esDuoc) subtotal * 0.10 else 0.0
     val totalFinal = subtotal - descuento
 
-    // ✅ ANIMACIÓN DEL TOTAL
     val totalAnimado by animateFloatAsState(
         targetValue = totalFinal.toFloat(),
         animationSpec = tween(450),
@@ -77,7 +72,6 @@ fun CarritoScreen(
                     snackbarHostState.showSnackbar(evento.mensaje)
 
                 is CarritoEvento.NavegarAPagoExitoso -> {
-                    // ✅ SOLO NAVEGACIÓN (SIN PROCESAR PAGO AQUÍ)
                     onIrACheckout(evento.idTransaccion)
                 }
             }
@@ -89,10 +83,20 @@ fun CarritoScreen(
 
         topBar = {
             TopAppBar(
-                title = { Text("Mi Carrito (${itemsCarrito.size})") },
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Carrito",
+                            color = Snow,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Onyx,
-                    titleContentColor = Snow
+                    containerColor = Onyx
                 ),
                 navigationIcon = {
                     IconButton(onClick = onVolverClick) {
@@ -150,7 +154,6 @@ fun CarritoScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // ✅ BOTÓN IR A CHECKOUT (YA NO PROCESA PAGO)
                     Button(
                         onClick = {
                             onIrACheckout("checkout")
@@ -219,9 +222,11 @@ fun CarritoScreen(
             }
         }
     }
-}               /* =========================
-                  💲 FORMATO PRECIO
-                   ========================= */
+}
+
+/* =========================
+   FORMATO PRECIO
+   ========================= */
 
 fun formatearPrecio(precio: Double): String {
     val precioEntero = precio.toInt()
@@ -232,6 +237,7 @@ fun formatearPrecio(precio: Double): String {
         .joinToString(".")
         .reversed()
 }
+
 @Composable
 fun CarritoItemDarkGamer(
     item: ItemCarrito,
@@ -327,4 +333,3 @@ fun CarritoItemDarkGamer(
         }
     }
 }
-

@@ -22,4 +22,7 @@ interface UsuarioDao {
 
     @Delete
     suspend fun eliminarUsuario(usuario: UsuarioEntity)
+    @Update
+    suspend fun actualizarUsuario(usuario: UsuarioEntity)
+
 }

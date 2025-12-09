@@ -26,19 +26,18 @@ fun AdminPanelScreen(
     onEliminarProducto: (Producto) -> Unit,
     onCerrarSesion: () -> Unit,
     usuarioViewModel: UsuarioViewModel,
-    onVerProductosApi: () -> Unit,
-    onVolver: () -> Unit // ✅ ESTE ES EL VOLVER REAL
+    onVolver: () -> Unit
 ) {
 
-    var mostrarDialogoEliminar by remember { mutableStateOf<Producto?>(null) }
+    var mostrarDialogoEliminarProducto by remember { mutableStateOf<Producto?>(null) }
+    var usuarioSeleccionado by remember { mutableStateOf<UsuarioEntity?>(null) }
+    var usuarioAEliminar by remember { mutableStateOf<UsuarioEntity?>(null) }
     var pestanaSeleccionada by remember { mutableStateOf(0) }
     var mostrarUsuarios by remember { mutableStateOf(false) }
 
     val usuarios by usuarioViewModel.listaUsuarios.collectAsState()
 
-    LaunchedEffect(Unit) {
-        usuarioViewModel.cargarUsuarios()
-    }
+    LaunchedEffect(Unit) { usuarioViewModel.cargarUsuarios() }
 
     Scaffold(
         topBar = {
@@ -46,92 +45,68 @@ fun AdminPanelScreen(
                 title = {
                     Column {
                         Text("Panel Admin")
-                        Text(
-                            text = "Sesión: $usernameAdmin",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
+                        Text("Sesión: $usernameAdmin", fontSize = 12.sp)
                     }
                 },
-
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.Default.ArrowBack, null)
                     }
                 },
-
                 actions = {
                     IconButton(onClick = onCerrarSesion) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión")
+                        Icon(Icons.Default.ExitToApp, null)
                     }
                 }
             )
         },
         floatingActionButton = {
             if (pestanaSeleccionada == 0) {
-                FloatingActionButton(
-                    onClick = onAgregarProducto,
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Agregar Producto")
+                FloatingActionButton(onClick = onAgregarProducto) {
+                    Icon(Icons.Default.Add, null)
                 }
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(padding)
         ) {
-
-            Button(
-                onClick = onVerProductosApi,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Ver Productos desde API")
-            }
 
             TabRow(selectedTabIndex = pestanaSeleccionada) {
                 Tab(
                     selected = pestanaSeleccionada == 0,
                     onClick = { pestanaSeleccionada = 0 },
-                    text = { Text("Productos") },
-                    icon = { Icon(Icons.Default.ShoppingCart, null) }
+                    text = { Text("Productos") }
                 )
                 Tab(
                     selected = pestanaSeleccionada == 1,
                     onClick = { pestanaSeleccionada = 1 },
-                    text = { Text("Estadísticas") },
-                    icon = { Icon(Icons.Default.Info, null) }
+                    text = { Text("Estadísticas") }
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
             Button(
                 onClick = { mostrarUsuarios = !mostrarUsuarios },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
             ) {
                 Text(if (mostrarUsuarios) "Ocultar Usuarios" else "Ver Usuarios Registrados")
             }
 
             if (mostrarUsuarios) {
-                Spacer(modifier = Modifier.height(12.dp))
-
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
                 ) {
                     items(usuarios) { usuario ->
-                        UsuarioItem(usuario)
+                        UsuarioItem(
+                            usuario = usuario,
+                            onEditar = { usuarioSeleccionado = it },
+                            onEliminar = { usuarioAEliminar = it }
+                        )
                     }
                 }
             }
@@ -140,7 +115,7 @@ fun AdminPanelScreen(
                 0 -> ListaProductos(
                     productos = productos,
                     onEditarProducto = onEditarProducto,
-                    onEliminarProducto = { mostrarDialogoEliminar = it }
+                    onEliminarProducto = { mostrarDialogoEliminarProducto = it }
                 )
 
                 1 -> EstadisticasPanel(productos)
@@ -148,54 +123,109 @@ fun AdminPanelScreen(
         }
     }
 
-    if (mostrarDialogoEliminar != null) {
+    /* ----------- DIÁLOGO EDITAR USUARIO ---------- */
+    usuarioSeleccionado?.let { user ->
+        var nombre by remember { mutableStateOf(user.nombreCompleto) }
+        var telefono by remember { mutableStateOf(user.telefono ?: "") }
+        var direccion by remember { mutableStateOf(user.direccion ?: "") }
+
         AlertDialog(
-            onDismissRequest = { mostrarDialogoEliminar = null },
-            title = { Text("Confirmar Eliminación") },
-            text = { Text("¿Eliminar '${mostrarDialogoEliminar!!.nombre}'?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    onEliminarProducto(mostrarDialogoEliminar!!)
-                    mostrarDialogoEliminar = null
-                }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+            onDismissRequest = { usuarioSeleccionado = null },
+            title = { Text("Editar Usuario") },
+            text = {
+                Column {
+                    OutlinedTextField(nombre, { nombre = it }, label = { Text("Nombre") })
+                    OutlinedTextField(telefono, { telefono = it }, label = { Text("Teléfono") })
+                    OutlinedTextField(direccion, { direccion = it }, label = { Text("Dirección") })
                 }
             },
+            confirmButton = {
+                TextButton(onClick = {
+                    val editado = user.copy(
+                        nombreCompleto = nombre,
+                        telefono = telefono,
+                        direccion = direccion
+                    )
+                    usuarioViewModel.actualizarUsuario(editado)
+                    usuarioSeleccionado = null
+                }) { Text("Guardar") }
+            },
             dismissButton = {
-                TextButton(onClick = { mostrarDialogoEliminar = null }) {
-                    Text("Cancelar")
-                }
+                TextButton(onClick = { usuarioSeleccionado = null }) { Text("Cancelar") }
+            }
+        )
+    }
+
+    /* ----------- DIÁLOGO ELIMINAR USUARIO ---------- */
+    usuarioAEliminar?.let {
+        AlertDialog(
+            onDismissRequest = { usuarioAEliminar = null },
+            title = { Text("Eliminar Usuario") },
+            text = { Text("¿Seguro que deseas eliminar este usuario?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    usuarioViewModel.eliminarUsuario(it)
+                    usuarioAEliminar = null
+                }) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { usuarioAEliminar = null }) { Text("Cancelar") }
+            }
+        )
+    }
+
+    /* ----------- DIÁLOGO ELIMINAR PRODUCTO ---------- */
+    mostrarDialogoEliminarProducto?.let {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoEliminarProducto = null },
+            title = { Text("Eliminar Producto") },
+            text = { Text("¿Eliminar ${it.nombre}?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onEliminarProducto(it)
+                    mostrarDialogoEliminarProducto = null
+                }) { Text("Eliminar") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mostrarDialogoEliminarProducto = null
+                }) { Text("Cancelar") }
             }
         )
     }
 }
 
-/* ================= USUARIOS ================= */
+/* ================= USUARIO ITEM ================= */
 
 @Composable
-fun UsuarioItem(usuario: UsuarioEntity) {
+fun UsuarioItem(
+    usuario: UsuarioEntity,
+    onEliminar: (UsuarioEntity) -> Unit,
+    onEditar: (UsuarioEntity) -> Unit
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
     ) {
         Column(Modifier.padding(12.dp)) {
             Text("👤 ${usuario.nombreCompleto}", fontWeight = FontWeight.Bold)
             Text("📧 ${usuario.email}")
             Text("📱 ${usuario.telefono}")
             Text("🏠 ${usuario.direccion}")
-            Text("🎂 Nacimiento: ${usuario.anioNacimiento}")
-            Text("⭐ Código propio: ${usuario.codigoPropio}")
-            usuario.codigoReferido?.let {
-                Text("🔗 Código referido: $it")
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { onEditar(usuario) }) {
+                    Icon(Icons.Default.Edit, null)
+                }
+                IconButton(onClick = { onEliminar(usuario) }) {
+                    Icon(Icons.Default.Delete, null)
+                }
             }
         }
     }
 }
-
 /* ================= PRODUCTOS ================= */
 
 @Composable

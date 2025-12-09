@@ -36,9 +36,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-private val FondoHomeDark = Color(0xFF1B1B1E)
-private val MoradoOscuro = Color(0xFF2A1F3D)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(

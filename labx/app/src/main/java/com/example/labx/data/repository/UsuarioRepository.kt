@@ -30,4 +30,8 @@ class UsuarioRepository(
     suspend fun eliminarUsuario(usuario: UsuarioEntity) {
         usuarioDao.eliminarUsuario(usuario)
     }
+    suspend fun actualizarUsuario(usuario: UsuarioEntity) {
+        usuarioDao.actualizarUsuario(usuario)
+    }
+
 }

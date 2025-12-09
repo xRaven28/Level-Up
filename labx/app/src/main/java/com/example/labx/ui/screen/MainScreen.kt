@@ -16,15 +16,10 @@ import androidx.compose.ui.unit.sp
 import com.example.labx.domain.model.Producto
 import com.example.labx.ui.viewmodel.CarritoViewModel
 
-/**
- * Pantalla principal de la app
- * Muestra productos disponibles y carrito actual
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: CarritoViewModel) {
 
-    // Observar estado desde ViewModel
     val itemsCarrito by viewModel.itemsCarrito.collectAsState()
     val totalCarrito by viewModel.totalCarrito.collectAsState()
 
@@ -45,7 +40,6 @@ fun MainScreen(viewModel: CarritoViewModel) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Sección 1: Productos disponibles
             Text(
                 text = " Productos Disponibles",
                 fontSize = 20.sp,
@@ -63,7 +57,6 @@ fun MainScreen(viewModel: CarritoViewModel) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Sección 2: Carrito actual
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,7 +82,6 @@ fun MainScreen(viewModel: CarritoViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Lista de items en carrito
             if (itemsCarrito.isEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
