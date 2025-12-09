@@ -2,8 +2,8 @@ package com.example.labx.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val MoradoFuerte = Color(0xFF9C55E7)
-val MoradoProfundo = Color(0xFF311559)
-val MoradoClaro = Color(0xFF753FBF)
-val AzulNegro = Color(0xFF0E1126)
-val BlancoLila = Color(0xFFEDE8F5)
+val Onyx = Color(0xFF131515)
+val Graphite = Color(0xFF2B2C28)
+val Verdigris = Color(0xFF339989)
+val PearlAqua = Color(0xFF7DE2D1)
+val Snow = Color(0xFFFFFAFB)

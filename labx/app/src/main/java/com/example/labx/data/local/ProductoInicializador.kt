@@ -34,7 +34,7 @@ object ProductoInicializador {
                         nombre = "Mouse Gamer RGB",
                         descripcion = "Mouse óptico profesional con 6 botones programables, sensor de 6400 DPI y retroiluminación RGB personalizable. Ideal para gaming y trabajo.",
                         precio = 25000.0,
-                        imagenUrl = "mouse_gamer", // Nombre del archivo en drawable/
+                        imagenUrl = "mouse_gamer",
                         categoria = "Periféricos",
                         stock = 15
                     ),
@@ -43,7 +43,7 @@ object ProductoInicializador {
                         nombre = "Teclado Mecánico",
                         descripcion = "Teclado mecánico con switches rojos, retroiluminación RGB por tecla, estructura de aluminio y reposamuñecas magnético.",
                         precio = 45000.0,
-                        imagenUrl = "teclado_mecanico", // Nombre del archivo en drawable/
+                        imagenUrl = "teclado_mecanico",
                         categoria = "Periféricos",
                         stock = 8
                     ),
@@ -52,7 +52,7 @@ object ProductoInicializador {
                         nombre = "Audífonos RGB",
                         descripcion = "Audífonos gaming over-ear con sonido envolvente 7.1, micrófono cancelación de ruido y almohadillas de espuma viscoelástica.",
                         precio = 35000.0,
-                        imagenUrl = "audifonos", // Nombre del archivo en drawable/
+                        imagenUrl = "audifonos",
                         categoria = "Audio",
                         stock = 12
                     ),

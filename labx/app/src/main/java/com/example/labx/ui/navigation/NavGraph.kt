@@ -1,5 +1,6 @@
 package com.example.labx.ui.navigation
 
+import LoginUniversalScreen
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,11 +20,13 @@ import com.example.labx.data.repository.UsuarioRepository
 import com.example.labx.domain.repository.RepositorioProductos
 import com.example.labx.ui.screen.*
 import com.example.labx.ui.viewmodel.*
+import com.example.labx.domain.model.Producto
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     preferenciasManager: PreferenciasManager,
+    carritoViewModel: CarritoViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -33,16 +36,11 @@ fun NavGraph(
             AppDatabase.getDatabase(context).productoDao()
         )
 
-    val carritoViewModel: CarritoViewModel = viewModel()
-
     val productoViewModel: ProductoViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(ProductoViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return ProductoViewModel(repositorioProductos) as T
-                }
-                throw IllegalArgumentException("ViewModel inválido")
+                @Suppress("UNCHECKED_CAST")
+                return ProductoViewModel(repositorioProductos) as T
             }
         }
     )
@@ -79,8 +77,34 @@ fun NavGraph(
                     when {
                         haySesionAdmin -> navController.navigate(Rutas.PANEL_ADMIN)
                         haySesionUsuario -> navController.navigate(Rutas.MI_CUENTA)
-                        else -> navController.navigate(Rutas.LOGIN_USUARIO)
+                        else -> navController.navigate("login_universal")
                     }
+                }
+            )
+        }
+
+        /* ---------- LOGIN UNIVERSAL ---------- */
+        composable("login_universal") {
+            LoginUniversalScreen(
+                usuarioViewModel = usuarioViewModel,
+                preferenciasManager = preferenciasManager,
+
+                onLoginUsuario = {
+                    navController.navigate(Rutas.HOME) {
+                        popUpTo("login_universal") { inclusive = true }
+                    }
+                },
+
+                onLoginAdmin = {
+                    navController.navigate(Rutas.PANEL_ADMIN) {
+                        popUpTo("login_universal") { inclusive = true }
+                    }
+                },
+
+                onVolverClick = { navController.popBackStack() },
+
+                onIrRegistro = {
+                    navController.navigate(Rutas.REGISTRO_USUARIO)
                 }
             )
         }
@@ -92,7 +116,6 @@ fun NavGraph(
                 usuarioViewModel = usuarioViewModel,
                 carritoViewModel = carritoViewModel,
 
-                // ✅ Enviamos SOLO EL ID
                 onProductoClick = { id ->
                     navController.navigate("${Rutas.DETALLE}/$id")
                 },
@@ -102,7 +125,7 @@ fun NavGraph(
                 },
 
                 onIrLogin = {
-                    navController.navigate(Rutas.LOGIN_USUARIO)
+                    navController.navigate("login_universal")
                 },
 
                 onMiCuentaClick = {
@@ -140,7 +163,6 @@ fun NavGraph(
                 usuarioViewModel = usuarioViewModel,
                 onVolverClick = { navController.popBackStack() },
 
-                // ✅ También navegamos por ID
                 onProductoClick = { id ->
                     navController.navigate("${Rutas.DETALLE}/$id")
                 },
@@ -192,37 +214,9 @@ fun NavGraph(
                         popUpTo(Rutas.HOME) { inclusive = true }
                     }
                 },
-                onIrLogin = { navController.navigate(Rutas.LOGIN_USUARIO) }
-            )
-        }
-
-        /* ---------- LOGIN USUARIO ---------- */
-        composable(Rutas.LOGIN_USUARIO) {
-            LoginUsuarioScreen(
-                usuarioViewModel = usuarioViewModel,
-                onLoginExitoso = {
-                    navController.navigate(Rutas.HOME) {
-                        popUpTo(Rutas.LOGIN_USUARIO) { inclusive = true }
-                    }
-                },
-                onVolverClick = { navController.popBackStack() },
-                onIrRegistro = {
-                    navController.navigate(Rutas.REGISTRO_USUARIO)
+                onIrLogin = {
+                    navController.navigate("login_universal")
                 }
-            )
-        }
-
-        /* ---------- LOGIN ADMIN ---------- */
-        composable(Rutas.LOGIN_ADMIN) {
-            LoginAdminScreen(
-                onLoginExitoso = {
-                    navController.navigate(Rutas.PANEL_ADMIN) {
-                        popUpTo(Rutas.LOGIN_ADMIN) { inclusive = true }
-                    }
-                },
-                onVolverClick = { navController.popBackStack() },
-                onValidarCredenciales = preferenciasManager::validarCredencialesAdmin,
-                onGuardarSesion = preferenciasManager::guardarSesionAdmin
             )
         }
 
@@ -234,7 +228,10 @@ fun NavGraph(
                 onCerrarSesion = {
                     navController.navigate(Rutas.PORTADA) { popUpTo(0) }
                 },
-                onVolver = { navController.popBackStack() }
+                onVolver = { navController.popBackStack() },
+                onIrHome = {
+                    navController.navigate(Rutas.HOME)
+                }
             )
         }
 
@@ -243,7 +240,7 @@ fun NavGraph(
 
             if (!preferenciasManager.estaAdminLogueado()) {
                 LaunchedEffect(Unit) {
-                    navController.navigate(Rutas.LOGIN_ADMIN) { popUpTo(0) }
+                    navController.navigate("login_universal") { popUpTo(0) }
                 }
                 return@composable
             }
@@ -253,41 +250,74 @@ fun NavGraph(
             AdminPanelScreen(
                 productos = productosState.productos,
                 usernameAdmin = preferenciasManager.obtenerUsernameAdmin() ?: "Admin",
+
+                // ✅ AGREGAR PRODUCTO (MISMA RUTA DEL FORMULARIO)
                 onAgregarProducto = {
                     navController.navigate("formulario_producto?productoId=-1")
                 },
+
+                // ✅ EDITAR PRODUCTO (MISMA RUTA + ID)
                 onEditarProducto = { producto ->
-                    navController.navigate(Rutas.formularioEditar(producto.id))
+                    navController.navigate("formulario_producto?productoId=${producto.id}")
                 },
+
                 onEliminarProducto = { producto ->
                     productoViewModel.eliminarProducto(producto)
                 },
+
                 onCerrarSesion = {
                     preferenciasManager.cerrarSesionAdmin()
                     navController.navigate(Rutas.PORTADA) { popUpTo(0) }
                 },
+
                 onVolver = {
                     navController.popBackStack()
                 },
+
                 usuarioViewModel = usuarioViewModel,
+
                 onVerProductosApi = {
                     navController.navigate(Rutas.PRODUCTOS_API)
                 }
             )
         }
 
-        /* ---------- PRODUCTOS API ---------- */
-        composable(Rutas.PRODUCTOS_API) {
-
-            if (!preferenciasManager.estaAdminLogueado()) {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Rutas.PORTADA) { popUpTo(0) }
+        /* ---------- FORMULARIO PRODUCTO (AGREGAR / EDITAR) ---------- */
+        composable(
+            route = "formulario_producto?productoId={productoId}",
+            arguments = listOf(
+                navArgument("productoId") {
+                    type = NavType.IntType
+                    defaultValue = -1
                 }
-                return@composable
+            )
+        ) { backStackEntry ->
+
+            val productoId = backStackEntry.arguments?.getInt("productoId") ?: -1
+
+            val productoExistenteState: State<Producto?> = produceState(initialValue = null, productoId) {
+                value = if (productoId != -1) {
+                    productoViewModel.obtenerProductoPorId(productoId)
+                } else {
+                    null
+                }
             }
 
-            ProductosApiScreen(
-                onVolver = {
+            val productoExistente = productoExistenteState.value
+
+            FormularioProductoScreen(
+                productoExistente = productoExistente,
+
+                onGuardar = { producto ->
+                    if (productoId == -1) {
+                        productoViewModel.agregarProducto(producto)
+                    } else {
+                        productoViewModel.actualizarProducto(producto)
+                    }
+                    navController.popBackStack()
+                },
+
+                onCancelar = {
                     navController.popBackStack()
                 }
             )

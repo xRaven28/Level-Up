@@ -32,6 +32,16 @@ import com.example.labx.ui.viewmodel.CarritoEvento
 import com.example.labx.ui.viewmodel.CarritoViewModel
 import kotlinx.coroutines.delay
 
+/* =========================
+   🎨 PALETA DARK GAMER
+   ========================= */
+
+private val Onyx = Color(0xFF131515)
+private val Graphite = Color(0xFF2B2C28)
+private val Verdigris = Color(0xFF339989)
+private val PearlAqua = Color(0xFF7DE2D1)
+private val Snow = Color(0xFFFFFAFB)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetalleProductoScreen(
@@ -40,6 +50,7 @@ fun DetalleProductoScreen(
     carritoViewModel: CarritoViewModel,
     onVolverClick: () -> Unit
 ) {
+
     var producto by remember { mutableStateOf<Producto?>(null) }
     var estaCargando by remember { mutableStateOf(true) }
 
@@ -48,7 +59,6 @@ fun DetalleProductoScreen(
 
     val context = LocalContext.current
 
-    // ✅ ANIMACIÓN SUAVE DEL PRECIO
     val animacionPrecio = rememberInfiniteTransition(label = "precio_anim")
     val escalaPrecio by animacionPrecio.animateFloat(
         initialValue = 1f,
@@ -60,7 +70,6 @@ fun DetalleProductoScreen(
         label = "escala"
     )
 
-    // ✅ EVENTOS DEL CARRITO
     LaunchedEffect(Unit) {
         carritoViewModel.eventos.collect { evento ->
             if (evento is CarritoEvento.MostrarMensaje) {
@@ -79,40 +88,41 @@ fun DetalleProductoScreen(
     }
 
     Scaffold(
+        containerColor = Onyx,
         topBar = {
             TopAppBar(
-                title = { Text("Detalle del Producto") },
+                title = { Text("Detalle del Producto", color = Snow) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Onyx),
                 navigationIcon = {
                     IconButton(onClick = onVolverClick) {
-                        Icon(Icons.Default.ArrowBack, null)
+                        Icon(Icons.Default.ArrowBack, null, tint = Snow)
                     }
                 }
             )
         }
     ) { padding ->
 
-        // ✅ FONDO CLARO (IGUAL QUE EL HOME)
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFF2F3F7),
-                            Color.White
-                        )
-                    )
-                )
+                .background(Onyx)
                 .padding(padding)
         ) {
 
             when {
                 estaCargando -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    CircularProgressIndicator(
+                        Modifier.align(Alignment.Center),
+                        color = Verdigris
+                    )
                 }
 
                 producto == null -> {
-                    Text("Producto no encontrado", color = Color.DarkGray)
+                    Text(
+                        "Producto no encontrado",
+                        color = Snow,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 else -> {
@@ -129,7 +139,7 @@ fun DetalleProductoScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
 
-                        // ✅ HERO CON LILA → MORADO
+                        // ✅ HERO DARK CON VERDIGRIS
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -137,8 +147,8 @@ fun DetalleProductoScreen(
                                 .background(
                                     Brush.verticalGradient(
                                         listOf(
-                                            Color(0xFFD1BFFF),
-                                            Color(0xFF7B4AE2)
+                                            Graphite,
+                                            Onyx
                                         )
                                     )
                                 ),
@@ -160,7 +170,7 @@ fun DetalleProductoScreen(
                             )
                         }
 
-                        // ✅ PRECIO FLOTANTE OSCURO
+                        // ✅ PRECIO FLOTANTE VERDIGRIS
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -176,35 +186,26 @@ fun DetalleProductoScreen(
                                         scaleY = escalaPrecio
                                     }
                                     .clip(RoundedCornerShape(22.dp))
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                Color(0xFF6A3FC9),
-                                                Color(0xFF4C2A85)
-                                            )
-                                        )
-                                    )
+                                    .background(Verdigris)
                                     .shadow(18.dp, RoundedCornerShape(22.dp))
                                     .padding(horizontal = 26.dp, vertical = 12.dp)
                             ) {
                                 Text(
                                     producto!!.precioFormateado(),
-                                    color = Color.White,
+                                    color = Snow,
                                     fontWeight = FontWeight.ExtraBold,
                                     fontSize = 20.sp
                                 )
                             }
                         }
 
-                        // ✅ CARD LILA CLARA
+                        // ✅ CARD GRAPHITE
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .offset(y = (-12).dp),
                             shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFE6D9FF)
-                            ),
+                            colors = CardDefaults.cardColors(containerColor = Graphite),
                             elevation = CardDefaults.cardElevation(14.dp)
                         ) {
                             Column(
@@ -216,34 +217,33 @@ fun DetalleProductoScreen(
 
                                 Text(
                                     producto!!.nombre,
-                                    color = Color(0xFF2B1454),
+                                    color = Snow,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold
                                 )
 
                                 Text(
                                     producto!!.categoria,
-                                    color = Color(0xFF4C2A85),
+                                    color = PearlAqua,
                                     fontSize = 13.sp
                                 )
 
-                                Divider(color = Color(0xFFB39DDB))
+                                Divider(color = Verdigris)
 
                                 Text(
                                     "Descripción",
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF2B1454)
+                                    color = Snow
                                 )
 
                                 Text(
                                     producto!!.descripcion,
-                                    color = Color(0xFF4C2A85),
+                                    color = PearlAqua,
                                     fontSize = 14.sp
                                 )
 
                                 Spacer(Modifier.height(20.dp))
 
-                                // ✅ BOTÓN MORADO
                                 Button(
                                     onClick = {
                                         carritoViewModel.agregarAlCarrito(producto!!)
@@ -253,14 +253,14 @@ fun DetalleProductoScreen(
                                         .height(62.dp),
                                     shape = RoundedCornerShape(24.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF9C55E7)
+                                        containerColor = Verdigris
                                     )
                                 ) {
                                     Text(
                                         "Agregar al Carrito",
                                         fontSize = 17.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        color = Snow
                                     )
                                 }
 
@@ -273,7 +273,7 @@ fun DetalleProductoScreen(
         }
     }
 
-    // ✅ NOTIFICACIÓN VISIBLE SIEMPRE
+    // ✅ NOTIFICACIÓN SUPERIOR
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -287,8 +287,8 @@ fun DetalleProductoScreen(
             modifier = Modifier.padding(top = 28.dp)
         ) {
             Surface(
-                color = Color(0xFF9C55E7),
-                contentColor = Color.White,
+                color = Verdigris,
+                contentColor = Snow,
                 shape = RoundedCornerShape(50),
                 shadowElevation = 10.dp
             ) {

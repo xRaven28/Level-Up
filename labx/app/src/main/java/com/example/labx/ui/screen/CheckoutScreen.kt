@@ -38,29 +38,21 @@ fun CheckoutScreen(
     onPagoExitoso: (String) -> Unit
 ) {
 
-    // ✅ ESTADOS DEL CARRITO
     val items by carritoViewModel.itemsCarrito.collectAsState()
-    // 🔥 AHORA EL SUBTOTAL SE CALCULA DIRECTO DESDE LOS ITEMS
-    val subtotal = remember(items) { items.sumOf { it.subtotal } }
+    val subtotal by carritoViewModel.totalCarrito.collectAsState()
     val estaProcesando by carritoViewModel.estaProcesando.collectAsState()
-
-    // ✅ DATOS DEL USUARIO
     val authState by usuarioViewModel.authState.collectAsState()
     val usuario = authState.usuarioActual
     val esDuoc = usuario?.esDuoc == true
-
     val descuento = if (esDuoc) subtotal * 0.10 else 0.0
     val totalFinal = subtotal - descuento
-
     var nombre by remember { mutableStateOf(usuario?.nombreCompleto ?: "") }
     var direccion by remember { mutableStateOf(usuario?.direccion ?: "") }
     var telefono by remember { mutableStateOf(usuario?.telefono ?: "") }
     var metodoPago by remember { mutableStateOf("Debito") }
-
     var numeroTarjeta by remember { mutableStateOf("") }
     var fechaVencimiento by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
-
     val esEnvioValido = nombre.length > 3 && direccion.length > 5 && telefono.length >= 8
 
     val esTarjetaValida = if (metodoPago == "Debito") {
@@ -74,8 +66,8 @@ fun CheckoutScreen(
             }
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -85,7 +77,8 @@ fun CheckoutScreen(
                             onClick = onVolverClick,
                             enabled = !estaProcesando
                         ) { Icon(Icons.Default.ArrowBack, "Volver") }
-                    })
+                    }
+                )
             },
             bottomBar = {
                 Surface(shadowElevation = 16.dp, color = MaterialTheme.colorScheme.surface) {
@@ -94,11 +87,13 @@ fun CheckoutScreen(
                             .padding(16.dp)
                             .navigationBarsPadding()
                     ) {
+
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Total a Pagar:", fontWeight = FontWeight.Bold)
+
                             Text(
                                 formatearPrecio(totalFinal),
                                 fontSize = 20.sp,
@@ -109,7 +104,12 @@ fun CheckoutScreen(
                         Spacer(Modifier.height(16.dp))
                         Button(
                             onClick = {
-                                carritoViewModel.procesarPago(nombre, direccion, metodoPago, esDuoc)
+                                carritoViewModel.procesarPago(
+                                    nombre,
+                                    direccion,
+                                    metodoPago,
+                                    esDuoc
+                                )
                             },
                             enabled = !estaProcesando && esEnvioValido && esTarjetaValida,
                             modifier = Modifier
@@ -117,7 +117,11 @@ fun CheckoutScreen(
                                 .height(50.dp),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            if (estaProcesando) Text("Procesando...") else Text("CONFIRMAR PAGO")
+                            if (estaProcesando) {
+                                Text("Procesando...")
+                            } else {
+                                Text("CONFIRMAR PAGO")
+                            }
                         }
                     }
                 }
@@ -130,15 +134,22 @@ fun CheckoutScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // SECCIÓN DATOS (Sin RUT)
                 CardFormulario("Datos de Facturación") {
+
                     CampoTexto(
                         nombre,
                         { nombre = it },
                         "Razón Social / Nombre",
                         Icons.Default.Person
                     )
-                    CampoTexto(direccion, { direccion = it }, "Dirección", Icons.Default.Home)
+
+                    CampoTexto(
+                        direccion,
+                        { direccion = it },
+                        "Dirección",
+                        Icons.Default.Home
+                    )
+
                     CampoTexto(
                         telefono,
                         { telefono = it },
@@ -148,31 +159,37 @@ fun CheckoutScreen(
                     )
                 }
 
-                // SECCIÓN PAGO
                 CardFormulario("Método de Pago") {
+
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+
                         OpcionPago(
                             "Débito",
                             metodoPago == "Debito",
                             Modifier.weight(1f)
                         ) { metodoPago = "Debito" }
+
                         OpcionPago(
                             "Transferencia",
                             metodoPago == "Transf",
                             Modifier.weight(1f)
                         ) { metodoPago = "Transf" }
                     }
+
                     Spacer(Modifier.height(16.dp))
+
                     AnimatedVisibility(visible = metodoPago == "Debito") {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
                             OutlinedTextField(
                                 value = numeroTarjeta,
                                 onValueChange = {
-                                    if (it.length <= 16 && it.all { c -> c.isDigit() }) numeroTarjeta =
-                                        it
+                                    if (it.length <= 16 && it.all { c -> c.isDigit() }) {
+                                        numeroTarjeta = it
+                                    }
                                 },
                                 label = { Text("Número Tarjeta") },
                                 modifier = Modifier.fillMaxWidth(),
@@ -181,17 +198,17 @@ fun CheckoutScreen(
                                 singleLine = true,
                                 placeholder = { Text("16 dígitos") }
                             )
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
+
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
                                 OutlinedTextField(
                                     value = fechaVencimiento,
                                     onValueChange = { if (it.length <= 5) fechaVencimiento = it },
                                     label = { Text("MM/AA") },
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true,
-                                    placeholder = { Text("12/28") }
+                                    singleLine = true
                                 )
+
                                 OutlinedTextField(
                                     value = cvv,
                                     onValueChange = {
@@ -200,12 +217,12 @@ fun CheckoutScreen(
                                     label = { Text("CVV") },
                                     modifier = Modifier.weight(1f),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    singleLine = true,
-                                    placeholder = { Text("123") }
+                                    singleLine = true
                                 )
                             }
                         }
                     }
+
                     AnimatedVisibility(visible = metodoPago == "Transf") {
                         Card(
                             colors = CardDefaults.cardColors(
@@ -223,9 +240,10 @@ fun CheckoutScreen(
                     }
                 }
 
-                // SECCIÓN RESUMEN
                 CardFormulario("Resumen del Pedido") {
+
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
                         items.forEach { item ->
                             Row(
                                 Modifier.fillMaxWidth(),
@@ -233,56 +251,50 @@ fun CheckoutScreen(
                             ) {
                                 Text(
                                     "${item.cantidad}x ${item.producto.nombre}",
-                                    style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier.weight(1f)
                                 )
-                                Text(
-                                    formatearPrecio(item.subtotal),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
+                                Text(formatearPrecio(item.subtotal))
                             }
                         }
+
                         Divider(Modifier.padding(vertical = 8.dp))
+
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Subtotal Netto")
+                            Text("Subtotal Neto")
                             Text(formatearPrecio(subtotal))
                         }
+
                         if (descuento > 0) {
                             Row(
                                 Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Descuento Duoc (10%)", color = Color(0xFF4CAF50))
+                                Text("Descuento DUOC (10%)", color = Color(0xFF4CAF50))
                                 Text("-${formatearPrecio(descuento)}", color = Color(0xFF4CAF50))
                             }
                         }
+
                         Divider(Modifier.padding(vertical = 8.dp))
+
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                "TOTAL A PAGAR",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                            Text(
-                                formatearPrecio(totalFinal),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
+                            Text("TOTAL A PAGAR", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text(formatearPrecio(totalFinal), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         }
                     }
                 }
+
                 Spacer(Modifier.height(60.dp))
             }
         }
+
         AnimatedVisibility(
             visible = estaProcesando,
             enter = fadeIn(),
@@ -308,20 +320,18 @@ fun CheckoutScreen(
     }
 }
 
-// Helpers
+/* ================= HELPERS ================= */
+
 @Composable
 fun CardFormulario(titulo: String, content: @Composable ColumnScope.() -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(
-                titulo,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+            Text(titulo, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(12.dp))
             content()
         }
     }
@@ -340,9 +350,7 @@ fun CampoTexto(
         onValueChange = onValueChange,
         label = { Text(label) },
         leadingIcon = { Icon(icon, null) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )
@@ -367,18 +375,10 @@ fun OpcionPago(
 @Composable
 fun DatoBanco(label: String, valor: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
-        Text(
-            valor,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            fontFamily = FontFamily.Monospace
-        )
+        Text(label, fontSize = 14.sp)
+        Text(valor, fontWeight = FontWeight.Medium, fontFamily = FontFamily.Monospace)
     }
 }
-

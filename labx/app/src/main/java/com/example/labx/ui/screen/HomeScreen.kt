@@ -1,5 +1,6 @@
 package com.example.labx.ui.screen
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -34,7 +35,9 @@ import com.example.labx.ui.viewmodel.UsuarioViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.animation.core.*
+
+private val FondoHomeDark = Color(0xFF1B1B1E)
+private val MoradoOscuro = Color(0xFF2A1F3D)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,19 +112,18 @@ fun HomeScreen(
             )
         }
     ) { padding ->
-
-        // ✅ FONDO CLARO
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        listOf(
-                            Color(0xFFF2F3F7),
-                            Color.White
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
                 )
+
                 .padding(padding)
         ) {
 
@@ -134,14 +136,13 @@ fun HomeScreen(
                     Text(
                         "No hay productos disponibles",
                         Modifier.align(Alignment.Center),
-                        color = Color.DarkGray
+                        color = Color.White
                     )
                 }
 
                 else -> {
                     Column {
 
-                        // ✅ BUSCADOR LEGIBLE
                         OutlinedTextField(
                             value = textoBusqueda,
                             onValueChange = { textoBusqueda = it },
@@ -149,31 +150,13 @@ fun HomeScreen(
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             placeholder = {
-                                Text(
-                                    "Buscar productos…",
-                                    color = Color.Gray
-                                )
+                                Text("Buscar productos…", color = Color.Gray)
                             },
-                            textStyle = LocalTextStyle.current.copy(
-                                color = Color(0xFF2B1454)
-                            ),
                             leadingIcon = {
-                                Icon(
-                                    Icons.Default.Search,
-                                    contentDescription = null,
-                                    tint = Color(0xFF6A3FC9)
-                                )
-                            },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF9C55E7),
-                                unfocusedBorderColor = Color(0xFFB39DDB),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White,
-                                cursorColor = Color(0xFF6A3FC9)
-                            )
+                                Icon(Icons.Default.Search, contentDescription = null)
+                            }
                         )
 
-                        // ✅ FILTROS LEGIBLES
                         Row(
                             modifier = Modifier
                                 .horizontalScroll(rememberScrollState())
@@ -183,26 +166,14 @@ fun HomeScreen(
                             FilterChip(
                                 selected = categoriaSeleccionada == null,
                                 onClick = { categoriaSeleccionada = null },
-                                label = { Text("Todos") },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFF9C55E7),
-                                    selectedLabelColor = Color.White,
-                                    containerColor = Color(0xFFE0E0E0),
-                                    labelColor = Color(0xFF2B1454)
-                                )
+                                label = { Text("Todos") }
                             )
 
                             categorias.forEach { categoria ->
                                 FilterChip(
                                     selected = categoriaSeleccionada == categoria,
                                     onClick = { categoriaSeleccionada = categoria },
-                                    label = { Text(categoria) },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = Color(0xFF9C55E7),
-                                        selectedLabelColor = Color.White,
-                                        containerColor = Color(0xFFE0E0E0),
-                                        labelColor = Color(0xFF2B1454)
-                                    )
+                                    label = { Text(categoria) }
                                 )
                             }
                         }
@@ -212,7 +183,7 @@ fun HomeScreen(
                             verticalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
                             items(productosFiltrados) { producto ->
-                                ProductoCardPremiumMorado(producto) {
+                                ProductoCardDarkGamer (producto) {
                                     onProductoClick(producto.id)
                                 }
                             }
@@ -223,16 +194,13 @@ fun HomeScreen(
         }
     }
 }
-
-// ===============================
-//   CARD PREMIUM LILA + PRECIO
-// ===============================
 @Composable
-fun ProductoCardPremiumMorado(
+fun ProductoCardDarkGamer(
     producto: Producto,
     onClick: () -> Unit
 ) {
     val context = LocalContext.current
+    val colors = MaterialTheme.colorScheme
 
     val imageModel = remember(producto.imagenUrl) {
         if (producto.imagenUrl.startsWith("http")) {
@@ -247,18 +215,6 @@ fun ProductoCardPremiumMorado(
         }
     }
 
-    // Lila suave de la card
-    val lilaCard = Color(0xFFE6D9FF)
-
-    // Fondo de imagen: lila → morado
-    val fondoImagenOscuro = Brush.verticalGradient(
-        listOf(
-            Color(0xFFD1BFFF),
-            Color(0xFF7B4AE2)
-        )
-    )
-
-    // Animación suave del precio
     val animacionPrecio = rememberInfiniteTransition(label = "precio_card")
     val escalaPrecio by animacionPrecio.animateFloat(
         initialValue = 1f,
@@ -273,20 +229,21 @@ fun ProductoCardPremiumMorado(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(230.dp)
+            .height(235.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = lilaCard),
-        elevation = CardDefaults.cardElevation(10.dp)
+        shape = RoundedCornerShape(22.dp),
+        elevation = CardDefaults.cardElevation(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        )
     ) {
         Column {
 
-            // Zona imagen
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(145.dp)
-                    .background(fondoImagenOscuro),
+                    .background(colors.background),
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
@@ -298,7 +255,6 @@ fun ProductoCardPremiumMorado(
                     contentScale = ContentScale.Fit
                 )
 
-                // Precio premium animado (oscuro)
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -311,8 +267,8 @@ fun ProductoCardPremiumMorado(
                         .background(
                             Brush.horizontalGradient(
                                 listOf(
-                                    Color(0xFF6A3FC9),
-                                    Color(0xFF4C2A85)
+                                    Color(0xFF339989),
+                                    Color(0xFF7DE2D1)
                                 )
                             )
                         )
@@ -328,23 +284,23 @@ fun ProductoCardPremiumMorado(
                 }
             }
 
-            // Texto de la card
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(lilaCard)
+                    .background(colors.surface)
                     .padding(14.dp)
             ) {
+
                 Text(
                     producto.nombre,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2B1454),
+                    color = colors.onSurface,
                     maxLines = 2
                 )
 
                 Text(
                     producto.categoria,
-                    color = Color(0xFF4C2A85),
+                    color = colors.onSurface.copy(alpha = 0.65f),
                     fontSize = 13.sp
                 )
 
@@ -353,17 +309,18 @@ fun ProductoCardPremiumMorado(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "Ver detalle",
-                        color = Color(0xFF6A3FC9),
+                        color = colors.primary,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.width(6.dp))
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = null,
-                        tint = Color(0xFF6A3FC9)
+                        tint = colors.primary
                     )
                 }
             }
         }
     }
 }
+

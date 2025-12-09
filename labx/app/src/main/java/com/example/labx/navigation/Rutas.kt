@@ -6,12 +6,12 @@ object Rutas {
     const val DETALLE = "detalle"
     const val CARRITO = "carrito"
     const val MI_CUENTA = "mi_cuenta"
-    const val LOGIN_USUARIO = "login_usuario"
+
+    const val LOGIN_UNIVERSAL = "login_universal"
     const val REGISTRO_USUARIO = "registro_usuario"
 
     const val CHECKOUT = "checkout"
     const val PAGO_EXITOSO = "pago_exitoso"
-    const val LOGIN_ADMIN = "login_admin"
     const val PANEL_ADMIN = "panel_admin"
     const val PRODUCTOS_API = "productos_api"
 

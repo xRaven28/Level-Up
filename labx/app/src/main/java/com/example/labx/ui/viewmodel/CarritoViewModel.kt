@@ -61,17 +61,20 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         dao.obtenerTodo()
             .map { lista ->
                 lista.map { entity ->
+
+                    val producto = Producto(
+                        id = entity.productoId,
+                        nombre = entity.nombre,
+                        descripcion = entity.descripcion,
+                        precio = entity.precio,
+                        imagenUrl = entity.imagenUrl,
+                        categoria = entity.categoria,
+                        stock = entity.stock
+                    )
+
                     ItemCarrito(
-                        producto = Producto(
-                            id = entity.productoId,
-                            nombre = entity.nombre,
-                            descripcion = entity.descripcion,
-                            precio = entity.precio,
-                            imagenUrl = entity.imagenUrl,
-                            categoria = entity.categoria,
-                            stock = entity.stock
-                        ),
-                        cantidad = entity.cantidad
+                        producto = producto,
+                        cantidad = entity.cantidad,
                     )
                 }
             }
@@ -81,7 +84,6 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
                 initialValue = emptyList()
             )
 
-    // ✅ TOTAL CALCULADO DESDE LOS ITEMS
     val totalCarrito: StateFlow<Double> =
         itemsCarrito.map { lista ->
             lista.sumOf { it.subtotal }
@@ -109,7 +111,6 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // ✅ AGREGAR PRODUCTO DIRECTO A ROOM
     fun agregarAlCarrito(producto: Producto) {
         viewModelScope.launch {
 
@@ -141,7 +142,6 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // ✅ VACIAR CARRITO
     fun vaciarCarrito() {
         viewModelScope.launch {
             dao.vaciar()
@@ -149,14 +149,12 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // ✅ MODIFICAR CANTIDAD
     fun modificarCantidad(productoId: Int, cantidad: Int) {
         viewModelScope.launch {
             dao.actualizarCantidad(productoId, cantidad)
         }
     }
 
-    // ✅ ELIMINAR PRODUCTO
     fun eliminarProducto(productoId: Int) {
         viewModelScope.launch {
             dao.eliminarProducto(productoId)
@@ -164,7 +162,6 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    // ✅ PROCESAR PAGO COMPLETO
     fun procesarPago(
         nombreCliente: String,
         direccion: String,
@@ -175,8 +172,10 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
 
             _estaProcesando.value = true
 
-            val itemsActuales = itemsCarrito.first()
-            val subtotalActual = totalCarrito.first()
+            val itemsActuales = itemsCarrito.value
+            val subtotalActual = totalCarrito.value
+
+            Log.d("PAY", "Subtotal recibido: $subtotalActual")
 
             val montoDescuento = if (esDuoc) subtotalActual * 0.10 else 0.0
             val totalFinalCalculado = subtotalActual - montoDescuento
@@ -209,4 +208,5 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
             )
         }
     }
+
 }

@@ -9,9 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,7 +29,8 @@ fun MiCuentaScreen(
     usuarioViewModel: UsuarioViewModel,
     preferenciasManager: PreferenciasManager,
     onCerrarSesion: () -> Unit,
-    onVolver: () -> Unit
+    onVolver: () -> Unit,
+    onIrHome: () -> Unit
 ) {
     val authState by usuarioViewModel.authState.collectAsState()
     val usuario = authState.usuarioActual
@@ -60,9 +59,19 @@ fun MiCuentaScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Cuenta") },
+
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+
+                actions = {
+                    IconButton(onClick = onIrHome) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Ir a comprar"
+                        )
                     }
                 }
             )
@@ -141,6 +150,7 @@ fun MiCuentaScreen(
             DatosItem("Puntos Level-Up:", usuario.puntosLevelUp.toString())
 
             Spacer(modifier = Modifier.height(30.dp))
+
             Button(
                 onClick = {
                     usuarioViewModel.cerrarSesion()
@@ -150,7 +160,7 @@ fun MiCuentaScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(Icons.Default.ExitToApp, contentDescription = null)

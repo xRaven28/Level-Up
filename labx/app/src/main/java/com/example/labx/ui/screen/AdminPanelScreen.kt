@@ -54,14 +54,12 @@ fun AdminPanelScreen(
                     }
                 },
 
-                // ✅ BOTÓN VOLVER (NO CIERRA SESIÓN)
                 navigationIcon = {
                     IconButton(onClick = onVolver) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
                 },
 
-                // ✅ BOTÓN CERRAR SESIÓN REAL
                 actions = {
                     IconButton(onClick = onCerrarSesion) {
                         Icon(Icons.Default.ExitToApp, contentDescription = "Cerrar Sesión")
@@ -302,7 +300,7 @@ fun EstadisticaCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceBright
         )
     ) {
         Row(

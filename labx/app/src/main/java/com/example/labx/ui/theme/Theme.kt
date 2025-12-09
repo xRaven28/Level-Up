@@ -6,44 +6,37 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
 private val DarkColorScheme = darkColorScheme(
-    primary = MoradoClaro,
-    onPrimary = Color.White,
+    primary = Verdigris,
+    onPrimary = Snow,
 
-    secondary = MoradoFuerte,
-    onSecondary = Color.White,
+    secondary = PearlAqua,
+    onSecondary = Onyx,
 
-    tertiary = MoradoProfundo,
-    onTertiary = Color.White,
+    background = Onyx,
+    onBackground = Snow,
 
-    background = AzulNegro,
-    onBackground = Color.White,
+    surface = Graphite,
+    onSurface = Snow,
 
-    surface = MoradoProfundo,
-    onSurface = Color.White,
-
-    surfaceVariant = MoradoFuerte.copy(alpha = 0.6f),
-    onSurfaceVariant = BlancoLila
+    surfaceVariant = Graphite.copy(alpha = 0.85f),
+    onSurfaceVariant = PearlAqua
 )
 private val LightColorScheme = lightColorScheme(
-    primary = MoradoFuerte,
-    onPrimary = Color.White,
+    primary = Verdigris,
+    onPrimary = Snow,
 
-    secondary = MoradoClaro,
-    onSecondary = Color.White,
+    secondary = PearlAqua,
+    onSecondary = Onyx,
 
-    tertiary = MoradoProfundo,
-    onTertiary = Color.White,
-
-    background = BlancoLila,
-    onBackground = AzulNegro,
+    background = Snow,
+    onBackground = Onyx,
 
     surface = Color.White,
-    onSurface = AzulNegro,
+    onSurface = Onyx,
 
-    surfaceVariant = MoradoClaro.copy(alpha = 0.18f),
-    onSurfaceVariant = MoradoProfundo
+    surfaceVariant = PearlAqua.copy(alpha = 0.18f),
+    onSurfaceVariant = Graphite
 )
 
 @Composable
@@ -51,7 +44,7 @@ fun LevelUpTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colors = if (darkTheme)DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colors,
